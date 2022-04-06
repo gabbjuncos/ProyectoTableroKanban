@@ -1,4 +1,4 @@
-import { generateId} from "./ids";
+import {generateId} from "./ids.js";
 
 export default class Board{
     id;
@@ -27,6 +27,6 @@ export default class Board{
 
     // geter
     get lenght(){
-        return
+        return this.items.length;
     }
 }
