@@ -38,6 +38,9 @@ function renderUI(){
     });
 
     container.innerHTML = boardsHTML.join('');
+
+    // cada vez que se envie a renderizar hay que volver a llamar a los eventos
+    enableNewCard();
 }
 
 function addBoard(e){
@@ -50,3 +53,20 @@ function addBoard(e){
         renderUI();
     }
 }
+// para crear una tarjeta cuando sea el evento de submit, prevenir que se submitee y mpoder manipular al informacion
+// cuando le demos enter cuando se cree una tarjeta se va a ejecutar esta funcion
+function enableNewCard(){
+    document.querySelectorAll('.form-new').forEach(form => {
+        // el eventos submit se activa cuando 
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+
+            const text = form.querySelector('.text').value;
+            const card = new Card(text);
+            // 
+            const indexBoard = form.querySelector('.index-board').value;
+            kanban.addCard(card, indexBoard);
+            // cuando se tenga eso, se va a renderizar la intefaz 
+        })
+    });
+}// en minuto 09 34
