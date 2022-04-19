@@ -18,7 +18,7 @@ export default class Board{
 
     // funcion que va a regresar el elemento de acuerdo al indice 
     get(indice){
-        return this.items[index];
+        return this.items[indice];
     }
     // para agregar elemento al final de un arreglo
     add(card){

@@ -44,6 +44,7 @@ function renderUI(){
 }
 
 function addBoard(e){
+    //cuadro emergente de google chorme
     const name = prompt('Name of board')
     // si name existe
     if(name){
@@ -67,6 +68,103 @@ function enableNewCard(){
             const indexBoard = form.querySelector('.index-board').value;
             kanban.addCard(card, indexBoard);
             // cuando se tenga eso, se va a renderizar la intefaz 
+            renderUI();
         })
     });
-}// en minuto 09 34
+    configureSubmenus();
+}
+
+function configureSubmenus(){
+
+    const moreButtons = document.querySelectorAll('.more-options');
+    moreButtons.forEach(button => {
+        // llama a la funcion showMoreOptions
+        button.addEventListener('click', showMoreOptions);
+    })
+
+    // referencia a cada uno de estos botones
+    const editBoardButton = document.querySelectorAll('.board-submenu-edit');
+    const deleteBoardButton = document.querySelectorAll('.board-submenu-delete');
+    const editCardButton = document.querySelectorAll('.card-submenu-edit');
+    const deleteCardButton = document.querySelectorAll('.card-submenu-delete');
+
+    // botones con los respectivos eventos
+
+    editBoardButton.forEach(button =>{
+        button.addEventListener('click', editBoard);
+    })
+
+    deleteBoardButton.forEach(button =>{
+        button.addEventListener('click', deleteBoard);
+    })
+
+    editCardButton.forEach(button =>{
+        button.addEventListener('click', editCard);
+    })
+
+    deleteCardButton.forEach(button =>{
+        button.addEventListener('click', deleteCard);
+    })
+
+    // defino los callbacks
+    function editBoard(e){
+        const id =  e.target.getAttribute('data-id');
+        const index =  e.target.getAttribute('data-index');
+        const currentTitle =  kanban.getBoard(index).title;
+        const title = prompt('New title', currentTitle);
+        if(title){
+            kanban.updateBoard(id,index, title);
+            renderUI();
+        }
+    }
+
+    function deleteBoard(e){
+        const index =  e.target.getAttribute('data-index');
+        kanban.removeBoard(index);
+        renderUI()
+    }
+
+    function editCard(e){
+        const indexCard =  e.target.getAttribute('data-index');
+        const indexBoard =  e.target.getAttribute('data-board-index');
+        const currentTitle =  kanban.getBoard(indexBoard).get(indexCard).title;
+
+        const title = prompt('New title', currentTitle);
+        if(title){
+            kanban.updateCard(indexBoard, indexCard, title);
+            renderUI();
+        }
+    }
+
+    function deleteCard(e){
+        const indexCard =  e.target.getAttribute('data-index');
+        const indexBoard =  e.target.getAttribute('data-board-index');
+
+        kanban.removeCard(indexBoard, indexCard);
+        renderUI();
+
+    }
+}
+
+
+function showMoreOptions(e){
+    // toma la capa hermana
+    const submenu = e.target.nextElementSibling;
+    // lo que hace es tomar una clase y sino existe la deja
+    submenu.classList.toggle('submenu-active');
+}
+
+// para ocultar el boton eliminar y editar de una tarjeta o tablero
+// se lo agrega al objeto global window
+
+window.addEventListener('click',e =>{
+    if(!e.target.matches('.more-options')){
+        const menus = Array.from(document.querySelectorAll('.submenu-active'));
+        menus.forEach(menu => {
+            if(menu.classList.contains('submenu-active')){
+                //aca no usa toggle por si existe se quiere quitar, y si no exite no pasa nada
+                menu.classList.remove('submenu-active');
+            }
+        })
+    }
+})
