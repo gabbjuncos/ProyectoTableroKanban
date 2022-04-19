@@ -1,0 +1,18 @@
+.board .new-item .form-new .new-input:hover{
+    background-color: #d5d5d5;
+}
+
+.board .new-item .form-new .new-input:focus{
+    background-color: white;
+}
+
+
+.hide .card-wrapper{
+    background-color: #9ed5f5 !important;
+    opacity: 0.5;
+}
+
+.drag-over{
+    background-color: yellow;
+}
+
