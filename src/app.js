@@ -218,6 +218,8 @@ function dragend(e){
 }
 
 function dragenter(e){
+    // para que permita hacer drag and drop
+    e.preventDefault();
     const item = e.target;
     dropOk = true;
 
@@ -227,20 +229,85 @@ function dragenter(e){
 }
 
 function dragover(e){
+    e.preventDefault();
     const item = e.target;
     if(item.classList.contains(classes.placeholder) || item.classList.contains('board')){
         item.classList.add(classes.active);
 
     }else if(item.getAttribute('data-id') != undefined){
         const id = item.getAttribute('data-id');
-        document.querySelector('.' + classes.active).querySelector('.placeholder').classList.add(classes.active);
+        document.querySelector('#' + id).querySelector('.placeholder').classList.add(classes.active)
     }
 }
 
 function dragleave(e){
-    e.target.classList.remove(classes.active);
-}
+    //e.target.classList.remove(classes.active);
+    // a cada estilo le voy a quitar clases .active
+    document.querySelector('.' + classes.active).forEach(style => style.classList.remove(classes.active));
+}   
 
 function drop(e){
-   
+
+    let target, id;
+    // se valida si existe el data id
+    // si no existe quiere decir que estoy agregando el drop al tablro
+    if(e.target.getAttribute('data-id') == undefined){
+        target = e.target;
+    }else{
+        // si existe quiere decir que estoy agregando sobre la tarjeta
+        id = e.target.getAttribute('data-id');
+        target = document.querySelector('#' + id);
+    }
+
+    // si es falso la variable quiere decir que estoy en un area no valida
+    // el dropOk la modificamos uando la funcion drop enter cuando estabamos en una zona
+    if(!dropOk){
+        return false;
+    }
+
+    const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+    const draggable = document.querySelector('#' + data.cardId);
+
+    let targetBoardId, targetCardId;
+
+    if(target.classList.contains('card')){
+        targetBoardId = target.parentElement.parentElement.id;
+        console.log(targetBoardId);
+
+        target.CardId = target.id;
+
+        target.insertAdjacentElement('afterend', draggable);
+    }
+    // si soltamos la tarjeta no hay un id de la tarjeta
+    else if(target.classList.contains('board')){
+        targetBoardId = target.id;
+        targetCardId = undefined;
+        //para que se agregue al final de la tarjeta
+        target.querySelector('.items').appendChild(draggable);
+    }
+
+    // para actualizar los datos
+    // es decir que lo que ve en la interfaz se corresponda con los datos del objeto KANBAN
+    // estoy seria para soltar el elemento en un lugar no valido
+    if(!targetCardId && !targetBoardId){
+        return false;
+    }
+
+    targetBoardId = targetBoardId.split('--')[1];
+    targetCardId = targetCardId?.split('--')[1] ?? -1;
+    data.cardId = data.cardId.split('--')[1];
+    data.boardId = data.boardId.split('--')[1];
+
+    const indexBoardSrc = kanban.getIndex(data.boardId);
+    // para obtener el indice
+    const indexBoardTarget = kanban.getIndex(targetBoardId);
+    const indexCardSrc = kanban.getBoard(indexBoardSrc).getIndex(data.cardId);
+    // verificar que devuelva -1
+    // con esta se tienen los indeces tanto del inicio como del finlal de la targeta
+    const indexCardTarget = (targetCardId === -1)? kanban.getBoard(indexBoardTarget).length : kanban.getBoard(indexBoardTarget).getIndex(targetCardId)
+
+    kanban.moveCard(indexBoardSrc, indexCardSrc, indexBoardTarget, indexCardTarget);
+    draggable.classList.remove(classes.hide);
+    renderUI();
 }
+
