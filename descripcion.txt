@@ -1,1 +1,3 @@
 proyecto final curso JS, tablero kanban
+hecho hasta el tablero kanban
+no esta hecho la parte get y post http
